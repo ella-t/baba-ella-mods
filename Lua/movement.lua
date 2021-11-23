@@ -1556,13 +1556,16 @@ function move(unitid,ox,oy,dir,specials_,instant_,simulate_,x_,y_)
 	
 	local x,y = 0,0
 	local unit = {}
+    local name = ""
 	
 	if (unitid ~= 2) then
 		unit = mmf.newObject(unitid)
 		x,y = unit.values[XPOS],unit.values[YPOS]
+        name = getname(unit)
 	else
 		x = x_
 		y = y_
+        name = "empty"
 	end
 	
 	local specials = {}
@@ -1571,6 +1574,25 @@ function move(unitid,ox,oy,dir,specials_,instant_,simulate_,x_,y_)
 	end
 	
 	local gone = false
+    
+    local loop = hasfeature(name,"is","loop",unitid,x,y)
+    local looping = (loop ~= nil) and (inbounds(x+ox,y+oy,1) == false)
+    
+    if (looping == true) then
+        if (ox == 0) then
+            if (oy == 1) then
+                y = 0
+            else
+                y = roomsizey - 1
+            end
+        else
+            if (ox == 1) then
+                x = 0
+            else
+                x = roomsizex - 1
+            end
+        end
+    end
 	
 	for i,v in pairs(specials) do
 		if (gone == false) then
@@ -1681,7 +1703,7 @@ function move(unitid,ox,oy,dir,specials_,instant_,simulate_,x_,y_)
 		if instant then
 			update(unitid,x+ox,y+oy,dir)
 			MF_alert("Instant movement on " .. tostring(unitid))
-		else
+        else
 			addaction(unitid,{"update",x+ox,y+oy,dir})
 		end
 		
