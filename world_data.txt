@@ -1,0 +1,7 @@
+[levels]
+rolling_levelid=1
+levelid=1
+
+[general]
+name=ella-mods
+mods=1
