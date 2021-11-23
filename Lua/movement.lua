@@ -993,6 +993,7 @@ function check(unitid,x,y,dir,pulling_,reason)
 	local shut = hasfeature(name,"is","shut",unitid,x,y)
 	local eat = hasfeature(name,"eat",nil,unitid,x,y)
 	local phantom = hasfeature(name,"is","phantom",unitid,x,y)
+    local loop = hasfeature(name,"is","loop",unitid,x,y)
 	
 	if pulling then
 		phantom = nil
@@ -1004,7 +1005,33 @@ function check(unitid,x,y,dir,pulling_,reason)
 		lockpartner = "open"
 	end
 	
-	local obs = findobstacle(x+ox,y+oy)
+	local obs = {}
+    
+    if (loop ~= nil) and (inbounds(x+ox,y+oy,1) == false) then
+        -- We are trying to go onto level edge, and we are loop: so this is loop case
+        -- We should check for obstacles at the loop destination tile instead
+        local loopx, loopy
+        
+        if (ox == 0) then
+            loopx = x
+            if (oy == 1) then
+                loopy = 1
+            else
+                loopy = roomsizey - 2
+            end
+        else
+            loopy = y
+            if (ox == 1) then
+                loopx = 1
+            else
+                loopx = roomsizex - 2
+            end
+        end
+        
+        obs = findobstacle(loopx,loopy)
+    else
+        obs = findobstacle(x+ox,y+oy)
+    end
 	
 	if (#obs > 0) and (phantom == nil) then
 		for i,id in ipairs(obs) do
